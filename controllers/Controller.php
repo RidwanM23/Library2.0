@@ -2,8 +2,9 @@
 
 class Controller
 {
-    protected static function view($page)
+    protected static function view($page, $data = [])
     {
+        $data;
         require $page;
     }
 }

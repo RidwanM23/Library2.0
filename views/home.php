@@ -1,4 +1,8 @@
-<?php include('templates/header.php') ?>
+<?php
+if (!defined('SECURE_ACCESS')) {
+    die('Direct access not permitted');
+}
+include('templates/header.php') ?>
 
 <div class="main-content login-panel login-panel-2">
     <h3 class="panel-title">Welcome! @ PI SCHOOL LIBRARY</h3>
