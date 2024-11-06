@@ -14,7 +14,23 @@ include('templates/header.php') ?>
         </div>
         <div class="bottom">
             <h3 class="panel-title">Register</h3>
-            <form method="POST" action="/db/auth.php">
+            <?php if (isset($_SESSION['success'])) : ?>
+                <div class="alert alert-success text-center">
+                    <?php
+                    echo $_SESSION['success'];
+                    unset($_SESSION['success']);
+                    ?>
+                </div>
+            <?php endif ?>
+            <?php if (isset($_SESSION['error'])) : ?>
+                <div class="alert alert-danger text-center">
+                    <?php
+                    echo $_SESSION['error'];
+                    unset($_SESSION['error']);
+                    ?>
+                </div>
+            <?php endif ?>
+            <form method="POST" action="register">
                 <div class="input-group mb-25">
                     <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
                     <input
@@ -45,7 +61,7 @@ include('templates/header.php') ?>
                 </div>
                 <button class="btn btn-primary w-100 login-btn" type="submit">Sign in</button>
                 <div class="mt-3">Have not you an accout?
-                    <a href="/register">Click here</a>
+                    <a href="/login">Click here</a>
                 </div>
             </form>
         </div>

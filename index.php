@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 define('SECURE_ACCESS', true);
 
 $uri = $_SERVER['REQUEST_URI'];
