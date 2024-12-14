@@ -4,53 +4,69 @@ require_once 'config/database.php';
 
 class Member
 {
-    private $id, $user_id, $nik, $full_name, $address, $phone;
-    private $created_at;
+    private $id, $username, $password;
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function getNik()
-    {
-        return $this->nik;
-    }
-
-    public function getFullName()
-    {
-        return $this->full_name;
-    }
-
-    public function getAddress()
-    {
-        return $this->address;
-    }
-
-    public function getPhone()
-    {
-        return $this->phone;
-    }
-
-    static function register($userId, $data)
+    static function register($data)
     {
         global $pdo;
-        $query = $pdo->prepare("INSERT INTO members (user_id, nik, full_name, address, phone, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-        return $query->execute([
-            $userId,
-            $data['nik'],
-            $data['full_name'],
-            $data['address'],
-            $data['phone']
-        ]);
+        try {
+            // Cek username sudah terdaftar atau belum
+            $stmt = $pdo->prepare("SELECT id FROM members WHERE username = ?");
+            $stmt->execute([$data['username']]);
+            if ($stmt->fetch()) {
+                throw new Exception("Username sudah terdaftar!");
+            }
+
+            $query = $pdo->prepare("
+                INSERT INTO members (username, password) 
+                VALUES (?, ?)
+            ");
+            
+            $result = $query->execute([
+                $data['username'],
+                password_hash($data['password'], PASSWORD_DEFAULT)
+            ]);
+
+            if ($result) {
+                // Auto login setelah register
+                $_SESSION['member_id'] = $pdo->lastInsertId();
+                $_SESSION['username'] = $data['username'];
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            throw new Exception("Gagal mendaftar: " . $e->getMessage());
+        }
     }
 
-    static function findByUserId($userId)
+    static function login($username, $password)
     {
         global $pdo;
-        $query = $pdo->prepare("SELECT * FROM members WHERE user_id = ?");
-        $query->execute([$userId]);
-        $query->setFetchMode(PDO::FETCH_CLASS, 'Member');
-        return $query->fetch();
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM members WHERE username = ?");
+            $stmt->execute([$username]);
+            $member = $stmt->fetch(PDO::FETCH_OBJ);
+
+            if ($member && password_verify($password, $member->password)) {
+                $_SESSION['member_id'] = $member->id;
+                $_SESSION['username'] = $member->username;
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    static function findByUsername($username)
+    {
+        global $pdo;
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM members WHERE username = ?");
+            $stmt->execute([$username]);
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 } 

@@ -5,17 +5,6 @@ define('SECURE_ACCESS', true);
 $uri = $_SERVER['REQUEST_URI'];
 $query_string = $_SERVER['QUERY_STRING'] ?? NULL;
 
-// Tambahkan route untuk fitur member dan peminjaman
-$routes['member-register'] = ['MemberController', 'register'];
-$routes['member-dashboard'] = ['MemberController', 'dashboard'];
-$routes['borrow-book'] = ['LoanController', 'borrow'];
-$routes['return-book'] = ['LoanController', 'return'];
-
-// Tambahkan route untuk admin
-$routes['manage-books'] = ['AdminController', 'manageBooks'];
-$routes['add-book'] = ['AdminController', 'addBook'];
-$routes['update-stock'] = ['AdminController', 'updateStock'];
-
 if ($uri == '/') {
     return require 'controllers/HomeController.php';
 }
@@ -38,6 +27,33 @@ if ($uri == '/book?' . $query_string) {
 
 if ($uri == '/login' || $uri == '/register') {
     return require 'controllers/AuthController.php';
+}
+
+// Tambahkan route untuk peminjaman
+if (isset($_GET['page']) && $_GET['page'] == 'borrow-book') {
+    require_once 'controllers/LoanController.php';
+    $controller = new LoanController();
+    return $controller->borrow();
+}
+
+// Tambahkan route untuk pengembalian
+if (isset($_GET['page']) && $_GET['page'] == 'return-book') {
+    require_once 'controllers/LoanController.php';
+    $controller = new LoanController();
+    return $controller->return();
+}
+
+// Tambahkan route untuk member
+if (isset($_GET['page']) && $_GET['page'] == 'member-register') {
+    require_once 'controllers/MemberController.php';
+    $controller = new MemberController();
+    return $controller->register();
+}
+
+if (isset($_GET['page']) && $_GET['page'] == 'member-dashboard') {
+    require_once 'controllers/MemberController.php';
+    $controller = new MemberController();
+    return $controller->dashboard();
 }
 
 return require 'views/notFoundPage.php';

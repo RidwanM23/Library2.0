@@ -28,15 +28,7 @@ include('templates/header.php') ?>
                 </div>
             <?php endif ?>
             <form method="POST" action="register">
-                <div class="input-group mb-25">
-                    <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Name"
-                        name="name"
-                        value="<?= isset($_SESSION['name']) ? $_SESSION['name'] : '' ?>">
-                </div>
+                
                 <div class="input-group mb-25">
                     <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
                     <input

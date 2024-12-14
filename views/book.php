@@ -33,21 +33,13 @@ include('templates/header.php') ?>
                     <?php foreach ($data as $book) : ?>
                         <tr>
                             <td><?= $number++ ?></td>
-                            <td><?= $book->getTittle() ?></td>
-                            <td><?= $book->getAuthor() ?></td>
-                            <td><?= $book->getYear() ?></td>
-                            <?php if ($book->getStock() > 0): ?>
-                                <td>
-                                    <form method="POST" action="index.php?page=borrow-book">
-                                        <input type="hidden" name="book_id" value="<?= $book->getId() ?>">
-                                        <button type="submit" class="btn btn-primary">Pinjam Buku</button>
-                                    </form>
-                                </td>
-                            <?php else: ?>
-                                <td>
-                                    <button class="btn btn-secondary" disabled>Stok Habis</button>
-                                </td>
-                            <?php endif; ?>
+                            <td><?= $book->tittle ?></td>
+                            <td><?= $book->author ?></td>
+                            <td><?= $book->year ?></td>
+                            <td>
+                                <a href="index.php?page=borrow-book&book_id=<?= $book->id ?>" 
+                                   class="btn btn-primary">Pinjam Buku</a>
+                            </td>
                         </tr>
                     <?php endforeach ?>
                 </tbody>

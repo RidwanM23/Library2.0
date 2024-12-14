@@ -4,7 +4,7 @@ require_once 'config/database.php';
 
 class Book
 {
-    private $id, $tittle, $author, $year, $stock;
+    private $id, $tittle, $author, $year;
 
     public function getId()
     {
@@ -26,64 +26,40 @@ class Book
         return $this->author;
     }
 
-    public function getStock()
-    {
-        return $this->stock;
-    }
-
-    public function updateStock($amount)
-    {
-        global $pdo;
-        $query = $pdo->prepare("UPDATE books SET stock = stock + ? WHERE id = ?");
-        return $query->execute([$amount, $this->id]);
-    }
-
     static function filter($search)
     {
         global $pdo;
-        $query = $pdo->query("SELECT * FROM books WHERE title LIKE '%$search%'");
-        return $query->fetchAll(PDO::FETCH_CLASS, 'Book');
+        try {
+            $search = "%$search%";
+            $stmt = $pdo->prepare("SELECT * FROM books WHERE tittle LIKE ?");
+            $stmt->execute([$search]);
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
     static function get()
     {
         global $pdo;
-        $query = $pdo->query("SELECT * FROM books");
-        return $query->fetchAll(PDO::FETCH_CLASS, 'Book');
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM books");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
     static function findById($id)
     {
         global $pdo;
-        $query = $pdo->prepare("SELECT * FROM books WHERE id = ?");
-        $query->execute([$id]);
-        $query->setFetchMode(PDO::FETCH_CLASS, 'Book');
-        return $query->fetch();
-    }
-
-    public function setStock($stock)
-    {
-        global $pdo;
-        $query = $pdo->prepare("UPDATE books SET stock = ? WHERE id = ?");
-        return $query->execute([$stock, $this->id]);
-    }
-
-    static function addStock($bookId, $amount)
-    {
-        global $pdo;
-        $query = $pdo->prepare("UPDATE books SET stock = stock + ? WHERE id = ?");
-        return $query->execute([$amount, $bookId]);
-    }
-
-    static function create($data)
-    {
-        global $pdo;
-        $query = $pdo->prepare("INSERT INTO books (tittle, author, year, stock) VALUES (?, ?, ?, ?)");
-        return $query->execute([
-            $data['tittle'],
-            $data['author'],
-            $data['year'],
-            $data['stock'] ?? 0
-        ]);
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM books WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 }

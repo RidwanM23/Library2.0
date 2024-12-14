@@ -7,22 +7,25 @@ class MemberController extends Controller
 {
     public function register()
     {
-        if (!$this->isLoggedIn()) {
-            header("Location: index.php?page=login");
-            return;
-        }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $result = Member::register($_SESSION['user_id'], [
-                    'nik' => $_POST['nik'],
-                    'full_name' => $_POST['full_name'],
-                    'address' => $_POST['address'],
-                    'phone' => $_POST['phone']
+                // Validasi input
+                if (empty($_POST['username']) || empty($_POST['password'])) {
+                    throw new Exception("Username dan password harus diisi!");
+                }
+
+                if (strlen($_POST['password']) < 6) {
+                    throw new Exception("Password minimal 6 karakter!");
+                }
+
+                $result = Member::register([
+                    'username' => $_POST['username'],
+                    'password' => $_POST['password']
                 ]);
 
                 if ($result) {
-                    header("Location: index.php?page=member-dashboard");
+                    // Redirect ke dashboard setelah register dan login otomatis
+                    header("Location: index.php?page=member-dashboard&success=1");
                     return;
                 }
             } catch (Exception $e) {
@@ -35,18 +38,18 @@ class MemberController extends Controller
 
     public function dashboard()
     {
-        if (!$this->isLoggedIn()) {
-            header("Location: index.php?page=login");
+        if (!isset($_SESSION['member_id'])) {
+            header("Location: index.php?page=member-register");
             return;
         }
 
-        $member = Member::findByUserId($_SESSION['user_id']);
+        $member = Member::findByUsername($_SESSION['username']);
         if (!$member) {
             header("Location: index.php?page=member-register");
             return;
         }
 
-        $activeLoans = Loan::getActiveLoansByMember($member->getId());
+        $activeLoans = Loan::getActiveLoansByMember($member->id);
         require 'views/member/dashboard.php';
     }
 } 

@@ -20,6 +20,7 @@ class AuthController extends Controller
             }
             $user = new User;
             $user->auth($username, $password);
+            $_SESSION['is_admin'] = $user['is_admin'];
             die();
         }
         return self::view("views/login.php");

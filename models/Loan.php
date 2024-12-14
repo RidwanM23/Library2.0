@@ -50,15 +50,6 @@ class Loan
         try {
             $pdo->beginTransaction();
 
-            // Cek stok buku
-            $book = Book::findById($bookId);
-            if ($book->getStock() <= 0) {
-                throw new Exception("Stok buku tidak tersedia");
-            }
-
-            // Kurangi stok
-            $book->updateStock(-1);
-
             // Buat peminjaman
             $dueDate = date('Y-m-d', strtotime('+' . self::LOAN_DURATION . ' days'));
             $query = $pdo->prepare("INSERT INTO loans (member_id, book_id, borrowed_at, due_date) VALUES (?, ?, NOW(), ?)");
@@ -90,10 +81,6 @@ class Loan
             // Update denda
             $query = $pdo->prepare("UPDATE loans SET fine_amount = ? WHERE id = ?");
             $query->execute([$fine, $loanId]);
-
-            // Kembalikan stok
-            $book = Book::findById($loan->book_id);
-            $book->updateStock(1);
 
             $pdo->commit();
             return $fine;

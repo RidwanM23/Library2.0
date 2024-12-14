@@ -7,14 +7,19 @@ require_once 'controllers/Controller.php';
 
 class LoanController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function borrow()
     {
-        if (!$this->isLoggedIn()) {
-            header("Location: index.php?page=login");
+        if (!isset($_SESSION['member_id'])) {
+            header("Location: index.php?page=member-register");
             return;
         }
 
-        $member = Member::findByUserId($_SESSION['user_id']);
+        $member = Member::findByUsername($_SESSION['username']);
         if (!$member) {
             header("Location: index.php?page=member-register");
             return;
@@ -22,7 +27,7 @@ class LoanController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $result = Loan::borrow($member->getId(), $_POST['book_id']);
+                $result = Loan::borrow($member->id, $_POST['book_id']);
                 if ($result) {
                     header("Location: index.php?page=member-dashboard&success=1");
                     return;
@@ -32,9 +37,14 @@ class LoanController extends Controller
             }
         }
 
-        $bookId = $_GET['book_id'] ?? null;
+        $bookId = $_GET['book_id'] ?? $_POST['book_id'] ?? null;
         $book = $bookId ? Book::findById($bookId) : null;
         
+        if (!$book) {
+            header("Location: /book");
+            return;
+        }
+
         require 'views/loan/borrow.php';
     }
 
