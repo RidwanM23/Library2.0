@@ -5,7 +5,7 @@ if (!defined('SECURE_ACCESS')) {
 include('templates/header.php') ?>
 
 <div class="main-content login-panel login-panel-2">
-    <h3 class="panel-title">Welcome! @ PI SCHOOL LIBRARY</h3>
+    <h3 class="panel-title">Welcome To LIBRARY</h3>
     <div class="login-body login-body-2">
         <div class="d-flex justify-content-center align-items-center">
             <a href="/book" class="text-center">

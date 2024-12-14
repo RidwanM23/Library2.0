@@ -8,7 +8,7 @@ include('templates/header.php') ?>
 
 <div class="main-content bg-white">
     <section class="container my-5">
-        <h3 class="panel-title text-center">Search Book @ PI SCHOOL LIBRARY</h3>
+        <h3 class="panel-title text-center">Search Book LIBRARY</h3>
         <form class="d-flex justify-content-between align-items-center">
             <input
                 type="text"
@@ -26,15 +26,28 @@ include('templates/header.php') ?>
                         <th>Title</th>
                         <th>Author</th>
                         <th>Years</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($data as $book) : ?>
                         <tr>
                             <td><?= $number++ ?></td>
-                            <td><?= $book->getTitle() ?></td>
+                            <td><?= $book->getTittle() ?></td>
                             <td><?= $book->getAuthor() ?></td>
                             <td><?= $book->getYear() ?></td>
+                            <?php if ($book->getStock() > 0): ?>
+                                <td>
+                                    <form method="POST" action="index.php?page=borrow-book">
+                                        <input type="hidden" name="book_id" value="<?= $book->getId() ?>">
+                                        <button type="submit" class="btn btn-primary">Pinjam Buku</button>
+                                    </form>
+                                </td>
+                            <?php else: ?>
+                                <td>
+                                    <button class="btn btn-secondary" disabled>Stok Habis</button>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach ?>
                 </tbody>
@@ -48,7 +61,7 @@ include('templates/header.php') ?>
         <div class="footer mb-0">
             <p>Copyright© <script>
                     document.write(new Date().getFullYear())
-                </script> All Rights Reserved By <span class="text-primary">PI SCHOOL LIBRARY</span></p>
+                </script> All Rights Reserved By <span class="text-primary">LIBRARY</span></p>
         </div>
     </section>
 </div>
